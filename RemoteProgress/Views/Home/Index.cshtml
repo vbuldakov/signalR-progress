@@ -1,0 +1,43 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Long running task</h2>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-1">
+            <button id="start" class="btn btn-success">Start</button>
+        </div>
+        <div class="col-md-2">
+            <p id="progress-view">Waiting to start.</p>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+
+        var hub = $.connection.progressHub;
+
+        hub.client.showProgress = function (progress) {
+            $('#progress-view').text(progress);
+        }
+
+        hub.client.onCompleted = function (message) {
+            $('#progress-view').text(message);
+            $.connection.hub.stop();
+            $('#start').removeClass("disabled")
+        }
+
+        $('#start').click(function () {
+            $('#start').addClass("disabled")
+            $.connection.hub.start().done(function () {
+                hub.server.start();
+            });
+
+        })
+
+    });
+</script>
